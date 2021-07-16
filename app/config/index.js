@@ -1,15 +1,19 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
-const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.ysfmd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+'use strick';
 
-module.exports = connectDB = async () => {
-  await mongoose.connect(url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  console.log('DataBase Connected');
-
-  mongoose.connection.on('error', (error) => {
-    console.log('Database Error: ', error);
-  });
-};
+if (process.env.NODE_ENV == 'production') {
+  // Push producton stage config data
+  module.exports = {
+    host: process.env.host || '',
+    dbURI: process.env.dbURI,
+    sessionsSecret: process.env.sessionSecret,
+    fb: {
+      clientID: process.env.fbClientID,
+      clientSecret: process.env.fbClientSecret,
+      callbackURL: process.env.host + '/auth/facebook/callback',
+      profileFields: ['id', 'displayName', 'photos'],
+    },
+  };
+} else {
+  // Push dev stage config data
+  module.exports = require();
+}
